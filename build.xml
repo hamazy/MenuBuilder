@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="MenuBuilder">
+	<property file="build.properties"></property>
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+	<property name="swing.defaultlaf" value="javax.swing.plaf.metal.MetalLookAndFeel"></property>
+    <path id="MenuBuilder.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/antlr-3.2.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.g"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="gen">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.g"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="test">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.g"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    	<delete>
+			<fileset dir="gen">
+		    	<include name="**/*.java"/>
+			</fileset>
+		</delete>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+    	<java classname="org.antlr.Tool" classpathref="MenuBuilder.classpath" fork="true" failonerror="true">
+    		<arg value="-fo"/>
+    		<arg value="gen/menubuilder"/>
+    		<arg value="src/menubuilder/Menu.g"/>
+    	</java>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <src path="gen"/>
+            <classpath refid="MenuBuilder.classpath"/>
+        </javac>
+    </target>
+    <target name="Main">
+        <java classname="menubuilder.Main" failonerror="true" fork="yes">
+            <classpath refid="MenuBuilder.classpath"/>
+        	<sysproperty key="file.encoding" value="UTF-8"/>
+			<sysproperty key="swing.defaultlaf" value="${swing.defaultlaf}"/>
+        </java>
+    </target>
+    <target name="MenuBuilder">
+    </target>
+</project>
